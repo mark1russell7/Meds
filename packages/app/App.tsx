@@ -43,6 +43,7 @@ function MedRow({ med }: { med: Med }) {
   const [offset, setOffset] = useState(0);
   const lastDeltaRef = useRef(0);
   const prevOffsetRef = useRef(0);
+  const scaleWRef = useRef(0);
 
   const [tilePositions] = useState(() =>
     Array.from({ length: n }, (_, i) => new Animated.Value((i * med.interval) % ringSize)),
@@ -77,7 +78,9 @@ function MedRow({ med }: { med: Med }) {
           lastDeltaRef.current = 0;
         },
         onPanResponderMove: (_, g) => {
-          const delta = Math.round(g.dx / 25);
+          const scaleW = scaleWRef.current;
+          if (scaleW === 0) return;
+          const delta = Math.round((g.dx * ringSize) / scaleW);
           if (delta !== lastDeltaRef.current) {
             const step = delta - lastDeltaRef.current;
             lastDeltaRef.current = delta;
@@ -92,7 +95,12 @@ function MedRow({ med }: { med: Med }) {
   return (
     <View style={s.row} {...panResponder.panHandlers}>
       <Text style={s.name}>{med.name}--{med.interval}h</Text>
-      <View style={s.scaleArea}>
+      <View
+        style={s.scaleArea}
+        onLayout={(e) => {
+          scaleWRef.current = e.nativeEvent.layout.width;
+        }}
+      >
         <View style={s.ticks}>
           {Array.from({ length: ringSize }, (_, i) => (
             <View key={i} style={s.tickSlot}>
