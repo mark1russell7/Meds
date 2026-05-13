@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { PanResponder, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { GlassView } from 'expo-glass-effect';
 import * as Haptics from 'expo-haptics';
 
 type Med = { name: string; interval: number };
@@ -25,7 +26,7 @@ const formatHour = (h: number, mode12: boolean): string => {
 export default function App() {
   return (
     <SafeAreaView style={s.root}>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
       {MEDS.map((med, i) => (
         <MedRow key={i} med={med} />
       ))}
@@ -38,7 +39,6 @@ function MedRow({ med }: { med: Med }) {
   const ringSize = mode12 ? 12 : 24;
   const n = mode12 ? 12 / med.interval : 24 / med.interval;
   const [offset, setOffset] = useState(0);
-
   const lastDeltaRef = useRef(0);
 
   const panResponder = useMemo(
@@ -64,21 +64,33 @@ function MedRow({ med }: { med: Med }) {
 
   return (
     <View style={s.row} {...panResponder.panHandlers}>
-      <View style={s.nameWrap}>
-        <Text style={s.name}>{med.name}--{med.interval}h</Text>
-      </View>
-      <View style={s.tiles}>
-        {Array.from({ length: n }, (_, i) => (
-          <View key={i} style={s.tile}>
-            <Text style={s.hour}>{formatHour((i * med.interval + offset) % ringSize, mode12)}</Text>
-          </View>
-        ))}
-      </View>
-      <View style={s.ticks}>
-        {Array.from({ length: ringSize }, (_, i) => {
-          const isMajor =
-            (((i - offset) % med.interval) + med.interval) % med.interval === 0;
-          return <View key={i} style={[s.tick, isMajor && s.tickMajor]} />;
+      <Text style={s.name}>{med.name}--{med.interval}h</Text>
+      <View style={s.scaleArea}>
+        <View style={s.ticks}>
+          {Array.from({ length: ringSize }, (_, i) => (
+            <View key={i} style={s.tickSlot}>
+              <View style={s.tick} />
+            </View>
+          ))}
+        </View>
+        {Array.from({ length: n }, (_, i) => {
+          const hour = (i * med.interval + offset) % ringSize;
+          return (
+            <GlassView
+              key={i}
+              glassEffectStyle="clear"
+              colorScheme="dark"
+              style={[
+                s.glass,
+                {
+                  left: `${(hour / ringSize) * 100}%`,
+                  width: `${(med.interval / ringSize) * 100}%`,
+                },
+              ]}
+            >
+              <Text style={s.hour}>{formatHour(hour, mode12)}</Text>
+            </GlassView>
+          );
         })}
       </View>
     </View>
@@ -86,14 +98,28 @@ function MedRow({ med }: { med: Med }) {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, padding: 8, gap: 8 },
-  row: { flex: 1 },
-  nameWrap: { flex: 1, justifyContent: 'center' },
-  name: { fontSize: 14 },
-  tiles: { flex: 4, flexDirection: 'row', gap: 4 },
-  tile: { flex: 1, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  hour: { fontSize: 22 },
-  ticks: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 4 },
-  tick: { width: 1, height: 4, backgroundColor: '#bbb' },
-  tickMajor: { width: 2, height: 8, backgroundColor: '#000' },
+  root: { flex: 1, padding: 12, gap: 10, backgroundColor: '#1C1C1E' },
+  row: {
+    flex: 1,
+    backgroundColor: '#2C2C2E',
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    overflow: 'hidden',
+  },
+  name: { color: 'rgba(255,255,255,0.6)', fontSize: 12, marginBottom: 4 },
+  scaleArea: { flex: 1, justifyContent: 'center', position: 'relative' },
+  ticks: { flexDirection: 'row', alignItems: 'center' },
+  tickSlot: { flex: 1, alignItems: 'center' },
+  tick: { width: 1, height: 28, backgroundColor: 'rgba(255,255,255,0.5)' },
+  glass: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    borderRadius: 10,
+  },
+  hour: { color: '#fff', fontSize: 22, fontWeight: '600' },
 });
