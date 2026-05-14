@@ -1,30 +1,11 @@
-import { useCallback, useState } from 'react';
+import { useMemo } from 'react';
+import { useConstrainedMap, type Constraint } from './useConstrainedMap';
 
-/**
- * Cardinality constraint enforced on every mutation.
- *
- * - `'none'`         — any subset is valid. (Multi-select.)
- * - `'at-most-one'`  — size ∈ {0, 1}. Adding replaces. (Accordion / single-expansion.)
- * - `'at-least-one'` — size ≥ 1. The last item cannot be removed.
- * - `'exactly-one'`  — size = 1. Like radio buttons.
- *
- * Constraints are *only* applied to user-initiated mutations (add/remove/toggle/
- * clear). The initial value is taken as given — if it violates the constraint
- * (e.g. empty set with `'exactly-one'`), the first valid mutation will pull it
- * back in line.
- */
-export type Constraint = 'none' | 'at-most-one' | 'at-least-one' | 'exactly-one';
+export type { Constraint };
 
 export type UseConstrainedSetOptions<T> = {
-  /** Cardinality rule. Defaults to `'none'`. */
   constraint?: Constraint;
-  /** Initial members. */
   initial?: Iterable<T>;
-  /**
-   * Fires synchronously before each state update. Useful for wiring
-   * `LayoutAnimation.configureNext(...)` (or other side-effects) right next
-   * to the mutation that triggered the layout change.
-   */
   beforeChange?: () => void;
 };
 
@@ -41,84 +22,42 @@ export type ConstrainedSetApi<T> = {
   clear: () => void;
 };
 
-const requiresNonEmpty = (c: Constraint): boolean =>
-  c === 'at-least-one' || c === 'exactly-one';
-
-const requiresAtMostOne = (c: Constraint): boolean =>
-  c === 'at-most-one' || c === 'exactly-one';
-
 /**
- * A `Set<T>` with optional cardinality constraints. The fundamental primitive
- * that `useExpansion` and similar selection hooks all reduce to.
+ * Boolean-keyed specialization of `useConstrainedMap` (V = true). Use when
+ * the only state you care about is "is this key present?" — selection,
+ * expansion, toggles. The set is just the key space of a Map<T, true>; the
+ * constraint logic comes from the underlying useConstrainedMap unchanged.
  */
 export function useConstrainedSet<T>(
   opts: UseConstrainedSetOptions<T> = {},
 ): ConstrainedSetApi<T> {
-  const constraint = opts.constraint ?? 'none';
-  const { beforeChange } = opts;
-  const [items, setItems] = useState<Set<T>>(() => new Set(opts.initial));
-
-  const has = useCallback((item: T) => items.has(item), [items]);
-
-  const add = useCallback(
-    (item: T) => {
-      setItems((prev) => {
-        // Already a member and not forced to be the only one → no-op.
-        if (prev.has(item) && (!requiresAtMostOne(constraint) || prev.size === 1)) {
-          return prev;
-        }
-        beforeChange?.();
-        if (requiresAtMostOne(constraint)) return new Set([item]);
-        const next = new Set(prev);
-        next.add(item);
-        return next;
-      });
-    },
-    [constraint, beforeChange],
+  const initialEntries = useMemo<Iterable<readonly [T, true]> | undefined>(
+    () =>
+      opts.initial
+        ? Array.from(opts.initial, (v) => [v, true] as const)
+        : undefined,
+    [opts.initial],
   );
 
-  const remove = useCallback(
-    (item: T) => {
-      setItems((prev) => {
-        if (!prev.has(item)) return prev;
-        if (requiresNonEmpty(constraint) && prev.size <= 1) return prev;
-        beforeChange?.();
-        const next = new Set(prev);
-        next.delete(item);
-        return next;
-      });
+  const map = useConstrainedMap<T, true>({
+    constraint: opts.constraint,
+    initial: initialEntries,
+    beforeChange: opts.beforeChange,
+  });
+
+  // `Set` view of the key space. Memoized off `map.entries` so identity is
+  // stable across renders that don't change the keys.
+  const items = useMemo(() => new Set(map.entries.keys()), [map.entries]);
+
+  return {
+    items,
+    has: (item) => map.entries.has(item),
+    add: (item) => map.set(item, true),
+    remove: (item) => map.delete(item),
+    toggle: (item) => {
+      if (map.entries.has(item)) map.delete(item);
+      else map.set(item, true);
     },
-    [constraint, beforeChange],
-  );
-
-  const toggle = useCallback(
-    (item: T) => {
-      setItems((prev) => {
-        if (prev.has(item)) {
-          if (requiresNonEmpty(constraint) && prev.size <= 1) return prev;
-          beforeChange?.();
-          const next = new Set(prev);
-          next.delete(item);
-          return next;
-        }
-        beforeChange?.();
-        if (requiresAtMostOne(constraint)) return new Set([item]);
-        const next = new Set(prev);
-        next.add(item);
-        return next;
-      });
-    },
-    [constraint, beforeChange],
-  );
-
-  const clear = useCallback(() => {
-    setItems((prev) => {
-      if (prev.size === 0) return prev;
-      if (requiresNonEmpty(constraint)) return prev;
-      beforeChange?.();
-      return new Set();
-    });
-  }, [constraint, beforeChange]);
-
-  return { items, has, add, remove, toggle, clear };
+    clear: map.clear,
+  };
 }
