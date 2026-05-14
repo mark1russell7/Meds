@@ -48,9 +48,9 @@ const requiresAtMostOne = (c: Constraint): boolean =>
 
 /**
  * A `Map<K, V>` with optional cardinality constraints on its key space. The
- * fundamental primitive that `useConstrainedSet` (and hence `useExpansion`)
- * reduce to via `V = true`. Reach for this directly when each key needs an
- * associated value (selection metadata, per-item config, etc.).
+ * fundamental primitive that `useConstrainedSet` reduces to via `V = true`.
+ * Reach for this directly when each key needs an associated value (selection
+ * metadata, per-item config, etc.).
  */
 export function useConstrainedMap<K, V>(
   opts: UseConstrainedMapOptions<K, V> = {},

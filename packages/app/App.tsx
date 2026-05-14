@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { LayoutAnimation, StyleSheet, UIManager, View } from 'react-native';
+import { useEffect, useMemo } from 'react';
+import { StyleSheet, UIManager, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
@@ -9,7 +9,7 @@ import { Iterator } from './components/Iterator';
 import { MedTile } from './components/MedTile';
 import { resetAndSeed, useMedsRepository } from './lib/medsCollection';
 import { useClock } from './lib/useClock';
-import { useExpansion } from './lib/useExpansion';
+import { useMedRegistry } from './lib/useMedRegistry';
 
 if (UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -18,14 +18,9 @@ if (UIManager.setLayoutAnimationEnabledExperimental) {
 export default function App() {
   const { meds, setOffset } = useMedsRepository();
   const now = useClock(60_000);
-  const expansion = useExpansion({
-    mode: 'single',
-    beforeChange: () =>
-      LayoutAnimation.configureNext({
-        duration: 240,
-        update: { type: 'easeInEaseOut' },
-      }),
-  });
+
+  const medIds = useMemo(() => meds.map((m) => m.id), [meds]);
+  const registry = useMedRegistry(medIds);
 
   useEffect(() => {
     resetAndSeed();
@@ -38,17 +33,20 @@ export default function App() {
         <SafeAreaView style={s.safeArea}>
           <StatusBar style="light" />
           <Iterator items={meds} layout={LAYOUT} keyExtractor={(m) => m.id}>
-            {(med, { itemStyle }) => (
-              <MedTile
-                med={med}
-                offset={med.offset}
-                setOffset={(v) => setOffset(med.id, v)}
-                expanded={expansion.isExpanded(med.id)}
-                onToggle={() => expansion.toggle(med.id)}
-                style={itemStyle}
-                now={now}
-              />
-            )}
+            {(med, { itemStyle }) => {
+              const actor = registry.getActor(med.id);
+              if (!actor) return null;
+              return (
+                <MedTile
+                  actor={actor}
+                  med={med}
+                  offset={med.offset}
+                  setOffset={(v) => setOffset(med.id, v)}
+                  style={itemStyle}
+                  now={now}
+                />
+              );
+            }}
           </Iterator>
         </SafeAreaView>
       </View>
