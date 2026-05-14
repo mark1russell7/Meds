@@ -1,7 +1,12 @@
 import type { ViewStyle } from 'react-native';
 import type { GridStrategy } from './lib/layout';
 
-export type Med = { name: string; interval: number };
+export type Med = {
+  id: string;
+  name: string;
+  interval: number;
+  offset: number;
+};
 
 export type MedTileProps = {
   med: Med;
@@ -13,16 +18,14 @@ export type MedTileProps = {
   now: Date;
 };
 
-export const MEDS: Med[] = [
-  { name: 'ipratropium bromide', interval: 12 },
-  { name: 'benzonatate', interval: 8 },
-  { name: 'acetaminophen', interval: 6 },
-  { name: 'albuterol sulfate', interval: 4 },
-  { name: 'flonase', interval: 24 },
-  { name: 'allegra', interval: 24 },
+export const SEED_MEDS: Med[] = [
+  { id: 'ipratropium', name: 'ipratropium bromide', interval: 12, offset: 0 },
+  { id: 'benzonatate', name: 'benzonatate', interval: 8, offset: 0 },
+  { id: 'acetaminophen', name: 'acetaminophen', interval: 6, offset: 0 },
+  { id: 'albuterol', name: 'albuterol sulfate', interval: 4, offset: 0 },
+  { id: 'flonase', name: 'flonase', interval: 24, offset: 0 },
+  { id: 'allegra', name: 'allegra', interval: 24, offset: 0 },
 ];
 
 // Cycle through these to compare layouts (hot-reload picks up the change):
 export const GRID_STRATEGY: GridStrategy = 'two-cols';
-
-export const STORAGE_KEY_OFFSETS = '@meds/offsets';

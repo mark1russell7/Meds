@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   LayoutAnimation,
   StyleSheet,
@@ -9,11 +9,11 @@ import {
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
-import { GRID_STRATEGY, MEDS } from './data';
+import { GRID_STRATEGY, SEED_MEDS, type Med } from './data';
 import { DotGrid } from './components/DotGrid';
 import { MedTile } from './components/MedTile';
 import { compressedTileStyle } from './lib/layout';
-import { loadOffsets, saveOffsets } from './lib/storage';
+import { medsCollection, resetAndSeed } from './lib/db';
 
 if (UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -21,47 +21,46 @@ if (UIManager.setLayoutAnimationEnabledExperimental) {
 
 export default function App() {
   const { width: screenWidth } = useWindowDimensions();
-  const [offsets, setOffsets] = useState<number[]>(() => MEDS.map(() => 0));
-  const [expandedIndex, setExpandedIndex] = useState<number>(-1);
+  const [meds, setMeds] = useState<Med[]>([]);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [nowTick, setNowTick] = useState<number>(Date.now());
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    loadOffsets().then((loaded) => {
-      if (loaded && loaded.length === MEDS.length) setOffsets(loaded);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => {
-      saveOffsets(offsets);
-    }, 500);
-    return () => {
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    let cancelled = false;
+    const refresh = () => {
+      if (cancelled) return;
+      setMeds(medsCollection.find().fetch());
     };
-  }, [offsets]);
+
+    resetAndSeed().then(refresh).catch(refresh);
+
+    medsCollection.on('added', refresh);
+    medsCollection.on('changed', refresh);
+    medsCollection.on('removed', refresh);
+
+    return () => {
+      cancelled = true;
+      medsCollection.off('added', refresh);
+      medsCollection.off('changed', refresh);
+      medsCollection.off('removed', refresh);
+    };
+  }, []);
 
   useEffect(() => {
     const id = setInterval(() => setNowTick(Date.now()), 60_000);
     return () => clearInterval(id);
   }, []);
 
-  const setOffsetFor = (i: number, v: number) => {
-    setOffsets((cur) => {
-      if (cur[i] === v) return cur;
-      const next = [...cur];
-      next[i] = v;
-      return next;
-    });
+  const setOffsetFor = (id: string, v: number) => {
+    medsCollection.updateOne({ id }, { $set: { offset: v } });
   };
 
-  const toggleExpanded = (i: number) => {
+  const toggleExpanded = (id: string) => {
     LayoutAnimation.configureNext({
       duration: 240,
       update: { type: 'easeInEaseOut' },
     });
-    setExpandedIndex((cur) => (cur === i ? -1 : i));
+    setExpandedId((cur) => (cur === id ? null : id));
   };
 
   const rootPadding = 16;
@@ -69,7 +68,7 @@ export default function App() {
   const compressed = compressedTileStyle(
     GRID_STRATEGY,
     screenWidth,
-    MEDS.length,
+    meds.length || SEED_MEDS.length,
     gap,
     rootPadding,
   );
@@ -82,14 +81,14 @@ export default function App() {
         <SafeAreaView style={s.safeArea}>
           <StatusBar style="light" />
           <View style={[s.grid, { padding: rootPadding, gap }]}>
-            {MEDS.map((med, i) => (
+            {meds.map((med) => (
               <MedTile
-                key={i}
+                key={med.id}
                 med={med}
-                offset={offsets[i] ?? 0}
-                setOffset={(v) => setOffsetFor(i, v)}
-                expanded={expandedIndex === i}
-                onToggle={() => toggleExpanded(i)}
+                offset={med.offset}
+                setOffset={(v) => setOffsetFor(med.id, v)}
+                expanded={expandedId === med.id}
+                onToggle={() => toggleExpanded(med.id)}
                 compressedStyle={compressed}
                 now={now}
               />
