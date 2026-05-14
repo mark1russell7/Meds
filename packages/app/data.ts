@@ -1,5 +1,5 @@
 import type { ViewStyle } from 'react-native';
-import type { GridStrategy } from './lib/layout';
+import { gridLayout, type LayoutStrategy } from './lib/layout';
 
 export type Med = {
   id: string;
@@ -14,7 +14,8 @@ export type MedTileProps = {
   setOffset: (v: number) => void;
   expanded: boolean;
   onToggle: () => void;
-  compressedStyle: ViewStyle;
+  /** Layout-assigned slot style (size). The tile may override when expanded. */
+  style: ViewStyle;
   now: Date;
 };
 
@@ -27,5 +28,9 @@ export const SEED_MEDS: Med[] = [
   { id: 'allegra', name: 'allegra', interval: 24, offset: 0 },
 ];
 
-// Cycle through these to compare layouts (hot-reload picks up the change):
-export const GRID_STRATEGY: GridStrategy = 'two-cols';
+// Cycle through layout strategies here — hot-reload picks up the change.
+// Alternatives:
+//   gridLayout({ cols: 2 })
+//   gridLayout({ cols: 3 })
+//   gridLayout({ cols: 'auto-square' })
+export const LAYOUT: LayoutStrategy = gridLayout({ cols: 2 });

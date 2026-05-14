@@ -1,18 +1,12 @@
 import { useEffect, useState } from 'react';
-import {
-  LayoutAnimation,
-  StyleSheet,
-  UIManager,
-  View,
-  useWindowDimensions,
-} from 'react-native';
+import { LayoutAnimation, StyleSheet, UIManager, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
-import { GRID_STRATEGY, SEED_MEDS } from './data';
+import { LAYOUT } from './data';
 import { DotGrid } from './components/DotGrid';
+import { Iterator } from './components/Iterator';
 import { MedTile } from './components/MedTile';
-import { compressedTileStyle } from './lib/layout';
 import { medsCollection, resetAndSeed } from './lib/db';
 import { useReactivity } from './lib/reactivity';
 
@@ -21,7 +15,6 @@ if (UIManager.setLayoutAnimationEnabledExperimental) {
 }
 
 export default function App() {
-  const { width: screenWidth } = useWindowDimensions();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [nowTick, setNowTick] = useState<number>(Date.now());
 
@@ -50,15 +43,6 @@ export default function App() {
     setExpandedId((cur) => (cur === id ? null : id));
   };
 
-  const rootPadding = 16;
-  const gap = 10;
-  const compressed = compressedTileStyle(
-    GRID_STRATEGY,
-    screenWidth,
-    meds.length || SEED_MEDS.length,
-    gap,
-    rootPadding,
-  );
   const now = new Date(nowTick);
 
   return (
@@ -67,20 +51,19 @@ export default function App() {
         <DotGrid />
         <SafeAreaView style={s.safeArea}>
           <StatusBar style="light" />
-          <View style={[s.grid, { padding: rootPadding, gap }]}>
-            {meds.map((med) => (
+          <Iterator items={meds} layout={LAYOUT} keyExtractor={(m) => m.id}>
+            {(med, { itemStyle }) => (
               <MedTile
-                key={med.id}
                 med={med}
                 offset={med.offset}
                 setOffset={(v) => setOffsetFor(med.id, v)}
                 expanded={expandedId === med.id}
                 onToggle={() => toggleExpanded(med.id)}
-                compressedStyle={compressed}
+                style={itemStyle}
                 now={now}
               />
-            ))}
-          </View>
+            )}
+          </Iterator>
         </SafeAreaView>
       </View>
     </SafeAreaProvider>
@@ -90,10 +73,4 @@ export default function App() {
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#1C1C1E' },
   safeArea: { flex: 1 },
-  grid: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignContent: 'flex-start',
-  },
 });

@@ -4,7 +4,7 @@ import { CompressedMedTile } from './CompressedMedTile';
 import { ExpandedMedTile } from './ExpandedMedTile';
 
 export function MedTile(props: MedTileProps) {
-  const containerStyle: ViewStyle = props.expanded ? s.expandedOuter : props.compressedStyle;
+  const containerStyle: ViewStyle = props.expanded ? s.expandedOuter : props.style;
   return (
     <View style={containerStyle}>
       {props.expanded ? <ExpandedMedTile {...props} /> : <CompressedMedTile {...props} />}
