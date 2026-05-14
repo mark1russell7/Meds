@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, PanResponder, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Animated, PanResponder, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { GlassView } from 'expo-glass-effect';
 import * as Haptics from 'expo-haptics';
@@ -27,12 +28,14 @@ const formatHour = (h: number, mode12: boolean): string => {
 
 export default function App() {
   return (
-    <SafeAreaView style={s.root}>
-      <StatusBar style="light" />
-      {MEDS.map((med, i) => (
-        <MedRow key={i} med={med} />
-      ))}
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView style={s.root}>
+        <StatusBar style="light" />
+        {MEDS.map((med, i) => (
+          <MedRow key={i} med={med} />
+        ))}
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
@@ -41,33 +44,18 @@ function MedRow({ med }: { med: Med }) {
   const ringSize = mode12 ? 12 : 24;
   const n = mode12 ? 12 / med.interval : 24 / med.interval;
   const [offset, setOffset] = useState(0);
+  const visualV = useRef(new Animated.Value(0)).current;
+  const visualVRef = useRef(0);
   const lastDeltaRef = useRef(0);
-  const prevOffsetRef = useRef(0);
+  const grantVisualVRef = useRef(0);
   const scaleWRef = useRef(0);
 
-  const [tilePositions] = useState(() =>
-    Array.from({ length: n }, (_, i) => new Animated.Value((i * med.interval) % ringSize)),
-  );
-
   useEffect(() => {
-    const prev = prevOffsetRef.current;
-    tilePositions.forEach((anim, i) => {
-      const prevHour = (i * med.interval + prev) % ringSize;
-      const newHour = (i * med.interval + offset) % ringSize;
-      const wraps = Math.abs(newHour - prevHour) > ringSize / 2;
-      if (wraps) {
-        anim.setValue(newHour);
-      } else {
-        Animated.spring(anim, {
-          toValue: newHour,
-          useNativeDriver: false,
-          speed: 28,
-          bounciness: 4,
-        }).start();
-      }
+    const id = visualV.addListener(({ value }) => {
+      visualVRef.current = value;
     });
-    prevOffsetRef.current = offset;
-  }, [offset, tilePositions, ringSize, med.interval]);
+    return () => visualV.removeListener(id);
+  }, [visualV]);
 
   const panResponder = useMemo(
     () =>
@@ -76,11 +64,16 @@ function MedRow({ med }: { med: Med }) {
         onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 5,
         onPanResponderGrant: () => {
           lastDeltaRef.current = 0;
+          grantVisualVRef.current = visualVRef.current;
+          visualV.stopAnimation();
         },
         onPanResponderMove: (_, g) => {
           const scaleW = scaleWRef.current;
           if (scaleW === 0) return;
-          const delta = Math.round((g.dx * ringSize) / scaleW);
+          const dragHours = (g.dx * ringSize) / scaleW;
+          visualV.setValue(grantVisualVRef.current + dragHours);
+
+          const delta = Math.round(dragHours);
           if (delta !== lastDeltaRef.current) {
             const step = delta - lastDeltaRef.current;
             lastDeltaRef.current = delta;
@@ -88,8 +81,22 @@ function MedRow({ med }: { med: Med }) {
             setOffset((cur) => (((cur + step) % ringSize) + ringSize) % ringSize);
           }
         },
+        onPanResponderRelease: () => {
+          const target = grantVisualVRef.current + lastDeltaRef.current;
+          Animated.spring(visualV, {
+            toValue: target,
+            useNativeDriver: false,
+            speed: 28,
+            bounciness: 4,
+          }).start(({ finished }) => {
+            if (finished) {
+              const wrapped = (((target % ringSize) + ringSize) % ringSize);
+              visualV.setValue(wrapped);
+            }
+          });
+        },
       }),
-    [ringSize],
+    [ringSize, visualV],
   );
 
   return (
@@ -108,26 +115,30 @@ function MedRow({ med }: { med: Med }) {
             </View>
           ))}
         </View>
-        {tilePositions.map((anim, i) => {
-          const leftAnim = anim.interpolate({
-            inputRange: [0, ringSize],
-            outputRange: ['0%', '100%'],
-          });
-          const hour = (i * med.interval + offset) % ringSize;
-          return (
-            <AnimatedGlassView
-              key={i}
-              glassEffectStyle="clear"
-              colorScheme="dark"
-              style={[
-                s.glass,
-                { left: leftAnim, transform: [{ translateX: -22 }] },
-              ]}
-            >
-              <Text style={s.hour}>{formatHour(hour, mode12)}</Text>
-            </AnimatedGlassView>
-          );
-        })}
+        {[-1, 0, 1].map((m) =>
+          Array.from({ length: n }, (_, i) => {
+            const shifted = Animated.add(visualV, i * med.interval + m * ringSize);
+            const leftAnim = shifted.interpolate({
+              inputRange: [0, ringSize],
+              outputRange: ['0%', '100%'],
+              extrapolate: 'extend',
+            });
+            const hour = (i * med.interval + offset) % ringSize;
+            return (
+              <AnimatedGlassView
+                key={`${m}-${i}`}
+                glassEffectStyle="clear"
+                colorScheme="dark"
+                style={[
+                  s.glass,
+                  { left: leftAnim, transform: [{ translateX: -22 }] },
+                ]}
+              >
+                <Text style={s.hour}>{formatHour(hour, mode12)}</Text>
+              </AnimatedGlassView>
+            );
+          }),
+        )}
       </View>
     </View>
   );
