@@ -20,12 +20,18 @@ importers:
 
   packages/app:
     dependencies:
+      '@maverick-js/signals':
+        specifier: ^6.0.0
+        version: 6.0.0
       '@react-native-async-storage/async-storage':
         specifier: 2.2.0
         version: 2.2.0(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))
       '@signaldb/core':
         specifier: ^1.8.1
         version: 1.8.1
+      '@signaldb/maverickjs':
+        specifier: ^1.0.0
+        version: 1.0.0(@maverick-js/signals@6.0.0)(@signaldb/core@1.8.1)
       '@signaldb/react':
         specifier: ^1.0.1
         version: 1.0.1(@signaldb/core@1.8.1)(react-dom@19.2.6(react@19.1.0))(react@19.1.0)
@@ -1069,6 +1075,9 @@ packages:
     engines: {node: '>=25.0.0', npm: '>=11.0.0'}
     hasBin: true
 
+  '@maverick-js/signals@6.0.0':
+    resolution: {integrity: sha512-aPAxQOjxcGaLpjMcfE0mRuMgnCVLfdPSGINYmKDjTbTfY37lZdz9CGnVDrkr+svNSADZbUVk7oPVjXA2+vtxYg==}
+
   '@react-native-async-storage/async-storage@2.2.0':
     resolution: {integrity: sha512-gvRvjR5JAaUZF8tv2Kcq/Gbt3JHwbKFYfmb445rhOj6NUMx3qPLixmDx5pZAyb9at1bYvJ4/eTUipU5aki45xw==}
     peerDependencies:
@@ -1276,6 +1285,12 @@ packages:
 
   '@signaldb/core@1.8.1':
     resolution: {integrity: sha512-85+ehSokMaKrPue42wPLmF+tU2jfky99kC2UlamfYS64I1YMMCWDeOdx17PNMpTxLdGFlCgnDEpTZB5XO3HFyQ==}
+
+  '@signaldb/maverickjs@1.0.0':
+    resolution: {integrity: sha512-fjO0KzQXN8GmtRZ5vMaGa/vFDiMgNz5bh9ri/c8/UsJ6AgV5fnhWn3LKhfUpPjrdJjiC4JsBVUkF37MnKInBQQ==}
+    peerDependencies:
+      '@maverick-js/signals': 5.x.x || 6.x
+      '@signaldb/core': 1.x
 
   '@signaldb/react@1.0.1':
     resolution: {integrity: sha512-OpeNn92+Lpa5YJZDTv9CjN08HAD6g8mQ5YcrrJEHW5H8m9C0a27/95S2Wo1gtPxqtVQ4Fb1k8bqxQssp5THA8A==}
@@ -4484,6 +4499,8 @@ snapshots:
 
   '@mark1russell7/cue@https://codeload.github.com/mark1russell7/cue/tar.gz/fb96d136d5c451b7ee4f16e50b756b855e7320ab': {}
 
+  '@maverick-js/signals@6.0.0': {}
+
   '@react-native-async-storage/async-storage@2.2.0(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))':
     dependencies:
       merge-options: 3.0.4
@@ -4687,6 +4704,11 @@ snapshots:
     dependencies:
       fast-sort: 3.4.1
       mingo: 7.2.1
+
+  '@signaldb/maverickjs@1.0.0(@maverick-js/signals@6.0.0)(@signaldb/core@1.8.1)':
+    dependencies:
+      '@maverick-js/signals': 6.0.0
+      '@signaldb/core': 1.8.1
 
   '@signaldb/react@1.0.1(@signaldb/core@1.8.1)(react-dom@19.2.6(react@19.1.0))(react@19.1.0)':
     dependencies:

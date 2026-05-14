@@ -12,8 +12,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@maverick-js/signals": "^6.0.0",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@signaldb/core": "^1.8.1",
+    "@signaldb/maverickjs": "^1.0.0",
     "@signaldb/react": "^1.0.1",
     "expo": "~54.0.33",
     "expo-glass-effect": "~0.1.10",
