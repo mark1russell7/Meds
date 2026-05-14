@@ -54,3 +54,36 @@ export function gridLayout(opts: GridLayoutOptions): LayoutStrategy {
     },
   };
 }
+
+export type ListLayoutOptions = {
+  /** Gap between items in pixels. Defaults to 10. */
+  gap?: number;
+  /** Outer padding in pixels. Defaults to 16. */
+  padding?: number;
+  /**
+   * Fixed item height in pixels. If omitted, each item sizes to its content.
+   */
+  itemHeight?: number;
+};
+
+/**
+ * Single-column vertical list. Each item takes the full width minus padding.
+ * Suitable for log views, settings, etc.
+ */
+export function listLayout(opts: ListLayoutOptions = {}): LayoutStrategy {
+  const gap = opts.gap ?? 10;
+  const padding = opts.padding ?? 16;
+  const itemHeight = opts.itemHeight;
+  return {
+    containerStyle: {
+      flex: 1,
+      flexDirection: 'column',
+      gap,
+      padding,
+    },
+    itemStyle: () => ({
+      width: '100%',
+      ...(itemHeight !== undefined ? { height: itemHeight } : {}),
+    }),
+  };
+}

@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import type { MedTileProps } from '../data';
+import type { MedTileProps } from '../types';
 import { formatHour } from '../lib/schedule';
 import { HourWheel } from './HourWheel';
 

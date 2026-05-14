@@ -1,4 +1,4 @@
-import type { Med } from '../data';
+import type { Med } from '../types';
 
 export const formatHour = (h: number, mode12: boolean): string => {
   if (mode12) return h === 0 ? '12' : String(h);

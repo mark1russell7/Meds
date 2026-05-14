@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { GlassView } from 'expo-glass-effect';
-import type { MedTileProps } from '../data';
+import type { MedTileProps } from '../types';
 import { formatClockHour, nextDose } from '../lib/schedule';
 
 export function CompressedMedTile({ med, offset, onToggle, now }: MedTileProps) {

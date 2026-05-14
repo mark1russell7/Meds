@@ -1,5 +1,5 @@
 import { StyleSheet, View, type ViewStyle } from 'react-native';
-import type { MedTileProps } from '../data';
+import type { MedTileProps } from '../types';
 import { CompressedMedTile } from './CompressedMedTile';
 import { ExpandedMedTile } from './ExpandedMedTile';
 
