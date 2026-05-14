@@ -52,38 +52,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.egg-info/
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg
-.venv/
-venv/
-env/
-ENV/
-.tox/
-.coverage
-.coverage.*
-.cache
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-htmlcov/
-.ipynb_checkpoints/
-
 # Node / JS
 node_modules/
 .npm
@@ -95,14 +63,6 @@ node_modules/
 .turbo/
 .svelte-kit/
 .cache/
-
-# DuckDB / data
-*.duckdb
-*.duckdb.wal
-*.duckdb.tmp/
-*.db
-*.sqlite
-*.sqlite3
 
 # Build / temp
 tmp/

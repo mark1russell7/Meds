@@ -1,4 +1,5 @@
 import { Collection, createPersistenceAdapter } from '@signaldb/core';
+import maverickjsReactivityAdapter from '@signaldb/maverickjs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SEED_MEDS, type Med } from '../data';
 
@@ -33,6 +34,7 @@ function createAsyncStorageAdapter<T extends { id: string }>(key: string) {
 
 export const medsCollection = new Collection<Med, string>({
   name: 'meds',
+  reactivity: maverickjsReactivityAdapter,
   persistence: createAsyncStorageAdapter<Med>(STORAGE_KEY),
 });
 
