@@ -15,6 +15,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
  */
 export type Constraint = 'none' | 'at-most-one' | 'at-least-one' | 'exactly-one';
 
+/**
+ * Why an entry was removed.
+ *
+ * - `'constraint'` — pushed out by cardinality enforcement (e.g. an
+ *   `at-most-one` map being replaced via `set`).
+ * - `'delete'`     — explicit `delete(key)` call.
+ * - `'clear'`      — explicit `clear()` call.
+ */
+export type EvictCause = 'constraint' | 'delete' | 'clear';
+
 export type UseConstrainedMapOptions<K, V> = {
   /** Cardinality rule. Defaults to `'none'`. */
   constraint?: Constraint;
@@ -26,6 +36,19 @@ export type UseConstrainedMapOptions<K, V> = {
    * to the mutation that triggered the layout change.
    */
   beforeChange?: () => void;
+  /**
+   * Fires synchronously when entries are removed from the map, before the
+   * new state is committed. The `cause` arg discriminates constraint-driven
+   * evictions from explicit `delete`/`clear` calls — letting the constraint
+   * itself own "what happens when a key is pushed out" rather than callers
+   * having to duplicate that logic at every mutation site.
+   *
+   * Fired inside the `setEntries` updater, so re-entrant state updates
+   * (e.g. dispatching to an actor whose subscriber mutates this map) batch
+   * with the originating mutation — important when this is paired with
+   * `LayoutAnimation.configureNext`.
+   */
+  onEvict?: (entries: ReadonlyMap<K, V>, cause: EvictCause) => void;
 };
 
 export type ConstrainedMapApi<K, V> = {
@@ -58,12 +81,17 @@ export function useConstrainedMap<K, V>(
   const constraint = opts.constraint ?? 'none';
   const [entries, setEntries] = useState<Map<K, V>>(() => new Map(opts.initial));
 
-  // Keep beforeChange in a ref so the mutation callbacks below stay stable
-  // across renders even when the consumer passes an inline arrow function.
+  // Keep beforeChange / onEvict in refs so the mutation callbacks below stay
+  // stable across renders even when the consumer passes inline arrow functions.
   const beforeChangeRef = useRef(opts.beforeChange);
   useEffect(() => {
     beforeChangeRef.current = opts.beforeChange;
   }, [opts.beforeChange]);
+
+  const onEvictRef = useRef(opts.onEvict);
+  useEffect(() => {
+    onEvictRef.current = opts.onEvict;
+  }, [opts.onEvict]);
 
   const set = useCallback(
     (key: K, value: V) => {
@@ -77,7 +105,13 @@ export function useConstrainedMap<K, V>(
           return prev;
         }
         beforeChangeRef.current?.();
-        if (requiresAtMostOne(constraint)) return new Map([[key, value]]);
+        if (requiresAtMostOne(constraint)) {
+          // Replacement under at-most-one constraint — everything else is evicted.
+          const evicted = new Map<K, V>();
+          for (const [k, v] of prev) if (k !== key) evicted.set(k, v);
+          if (evicted.size > 0) onEvictRef.current?.(evicted, 'constraint');
+          return new Map([[key, value]]);
+        }
         const next = new Map(prev);
         next.set(key, value);
         return next;
@@ -92,6 +126,7 @@ export function useConstrainedMap<K, V>(
         if (!prev.has(key)) return prev;
         if (requiresNonEmpty(constraint) && prev.size <= 1) return prev;
         beforeChangeRef.current?.();
+        onEvictRef.current?.(new Map([[key, prev.get(key) as V]]), 'delete');
         const next = new Map(prev);
         next.delete(key);
         return next;
@@ -105,6 +140,7 @@ export function useConstrainedMap<K, V>(
       if (prev.size === 0) return prev;
       if (requiresNonEmpty(constraint)) return prev;
       beforeChangeRef.current?.();
+      onEvictRef.current?.(new Map(prev), 'clear');
       return new Map();
     });
   }, [constraint]);

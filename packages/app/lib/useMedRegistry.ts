@@ -17,9 +17,15 @@ export type MedRegistryApi = {
  * hook holds the only place that cares about cross-actor coordination.
  */
 export function useMedRegistry(ids: string[]): MedRegistryApi {
-  // The cross-med constraint as a constrained set. `beforeChange` fires
-  // synchronously inside the setState updater, ahead of the next React render,
-  // which is when LayoutAnimation.configureNext needs to land.
+  const actorsRef = useRef(new Map<string, MedActorRef>());
+
+  // The cross-med "at most one expanded" rule lives entirely in the
+  // constrained set. The set is a mirror of actor state: actor subscribers
+  // call add/remove to keep it in sync, and the constraint itself owns what
+  // happens when an entry gets pushed out — `onEvict` reaches back into the
+  // evicted actor and sends it COLLAPSE. `beforeChange` fires synchronously
+  // inside the setState updater so LayoutAnimation.configureNext lands ahead
+  // of the same render that commits both the expand and the collapse.
   const expanded = useConstrainedSet<string>({
     constraint: 'at-most-one',
     beforeChange: () =>
@@ -27,9 +33,19 @@ export function useMedRegistry(ids: string[]): MedRegistryApi {
         duration: 240,
         update: { type: 'easeInEaseOut' },
       }),
+    onEvict: (evicted, cause) => {
+      // Only the constraint-driven case needs to push the actor — explicit
+      // remove() calls come from actor subscribers reacting to the actor
+      // already having collapsed on its own.
+      if (cause !== 'constraint') return;
+      for (const id of evicted) {
+        actorsRef.current.get(id)?.send({ type: 'COLLAPSE' });
+      }
+    },
   });
 
-  // Refs so actor subscriptions (set up once) always see the latest mutators.
+  // Refs so the actor subscription (set up once per id) always sees the
+  // latest mutators — useConstrainedSet returns fresh closures each render.
   const addExpandedRef = useRef(expanded.add);
   useEffect(() => {
     addExpandedRef.current = expanded.add;
@@ -38,8 +54,6 @@ export function useMedRegistry(ids: string[]): MedRegistryApi {
   useEffect(() => {
     removeExpandedRef.current = expanded.remove;
   });
-
-  const actorsRef = useRef(new Map<string, MedActorRef>());
 
   // Sync actor instances with the current id list.
   const idsKey = ids.join('|');
@@ -55,26 +69,16 @@ export function useMedRegistry(ids: string[]): MedRegistryApi {
       }
     }
 
-    // Spawn actors for newly-introduced ids.
+    // Spawn actors for newly-introduced ids. The subscriber's only job is
+    // to mirror actor state into `expanded`; the constraint handles the
+    // cross-actor coordination via onEvict above.
     for (const id of ids) {
       if (actors.has(id)) continue;
       const actor = createActor(medMachine, { input: { id } });
 
       actor.subscribe((snapshot) => {
-        if (snapshot.matches('expanded')) {
-          // Synchronously collapse any other actor that's currently expanded.
-          // Doing this in the subscriber (rather than via a separate useEffect
-          // reacting to expanded.items changes) keeps both transitions inside
-          // the same React batch, so LayoutAnimation animates them together.
-          for (const [otherId, otherActor] of actors.entries()) {
-            if (otherId !== id && otherActor.getSnapshot().matches('expanded')) {
-              otherActor.send({ type: 'COLLAPSE' });
-            }
-          }
-          addExpandedRef.current(id);
-        } else {
-          removeExpandedRef.current(id);
-        }
+        if (snapshot.matches('expanded')) addExpandedRef.current(id);
+        else removeExpandedRef.current(id);
       });
       actor.start();
       actors.set(id, actor);

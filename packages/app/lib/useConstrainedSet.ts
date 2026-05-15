@@ -1,12 +1,22 @@
 import { useMemo } from 'react';
-import { useConstrainedMap, type Constraint } from './useConstrainedMap';
+import {
+  useConstrainedMap,
+  type Constraint,
+  type EvictCause,
+} from './useConstrainedMap';
 
-export type { Constraint };
+export type { Constraint, EvictCause };
 
 export type UseConstrainedSetOptions<T> = {
   constraint?: Constraint;
   initial?: Iterable<T>;
   beforeChange?: () => void;
+  /**
+   * Fires synchronously when items are removed from the set. See
+   * `useConstrainedMap`'s `onEvict` for the precise timing semantics and the
+   * meaning of each `cause`.
+   */
+  onEvict?: (items: T[], cause: EvictCause) => void;
 };
 
 export type ConstrainedSetApi<T> = {
@@ -43,6 +53,9 @@ export function useConstrainedSet<T>(
     constraint: opts.constraint,
     initial: initialEntries,
     beforeChange: opts.beforeChange,
+    onEvict: opts.onEvict
+      ? (entries, cause) => opts.onEvict!(Array.from(entries.keys()), cause)
+      : undefined,
   });
 
   // `Set` view of the key space. Memoized off `map.entries` so identity is
