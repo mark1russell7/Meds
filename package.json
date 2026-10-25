@@ -8,12 +8,13 @@
     "node": ">=22"
   },
   "scripts": {
-    "package": "tsx packages/cli/src/index.ts package",
+    "package": "template package",
     "test": "pnpm -r run test",
     "typecheck": "pnpm -r run typecheck"
   },
   "devDependencies": {
     "@mark1russell7/cue": "github:mark1russell7/cue",
+    "@mark1russell7/template-cli": "^0.1.2",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   }
