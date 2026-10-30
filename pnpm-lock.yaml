@@ -10,10 +10,10 @@ importers:
     devDependencies:
       '@mark1russell7/cue':
         specifier: github:mark1russell7/cue
-        version: https://codeload.github.com/mark1russell7/cue/tar.gz/9005ddbd0aac6d10992f638506b14e16b1eb2de8
+        version: https://codeload.github.com/mark1russell7/cue/tar.gz/bc0f68b9ab99eaebae25c64d13400ed7e36bbc96
       '@mark1russell7/template-cli':
         specifier: ^0.1.2
-        version: 0.1.2
+        version: 0.1.4
       tsx:
         specifier: ^4.19.2
         version: 4.21.0
@@ -923,14 +923,14 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@mark1russell7/cue@https://codeload.github.com/mark1russell7/cue/tar.gz/9005ddbd0aac6d10992f638506b14e16b1eb2de8':
-    resolution: {tarball: https://codeload.github.com/mark1russell7/cue/tar.gz/9005ddbd0aac6d10992f638506b14e16b1eb2de8}
-    version: 1.0.2
+  '@mark1russell7/cue@https://codeload.github.com/mark1russell7/cue/tar.gz/bc0f68b9ab99eaebae25c64d13400ed7e36bbc96':
+    resolution: {tarball: https://codeload.github.com/mark1russell7/cue/tar.gz/bc0f68b9ab99eaebae25c64d13400ed7e36bbc96}
+    version: 1.1.0
     engines: {node: '>=22'}
     hasBin: true
 
-  '@mark1russell7/template-cli@0.1.2':
-    resolution: {integrity: sha512-PymBwlcDGyJiGZCQ6y9+dxWCpKPMSoqky5WkuNP+paoQp8z6vFkQJZTeIozxRHPtCipL2GmHg6RmpthaWAiM5g==}
+  '@mark1russell7/template-cli@0.1.4':
+    resolution: {integrity: sha512-wXhE7Kqjm8O0jGkxHBgFRn+d1qe8rffcrfbURPor1knmO6Sf/eQ3uKCqgCsP+PSlSVidaQu8GnUWo1jD3Fdm7A==}
     engines: {node: '>=22.12'}
     hasBin: true
 
@@ -4002,9 +4002,9 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@mark1russell7/cue@https://codeload.github.com/mark1russell7/cue/tar.gz/9005ddbd0aac6d10992f638506b14e16b1eb2de8': {}
+  '@mark1russell7/cue@https://codeload.github.com/mark1russell7/cue/tar.gz/bc0f68b9ab99eaebae25c64d13400ed7e36bbc96': {}
 
-  '@mark1russell7/template-cli@0.1.2':
+  '@mark1russell7/template-cli@0.1.4':
     dependencies:
       '@clack/prompts': 1.8.1
 
