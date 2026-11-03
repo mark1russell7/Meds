@@ -1,5 +1,7 @@
 packages:
   - "packages/*"
+  # The site of GitHub Pages is a private package of the workspace.
+  - "site"
 
 onlyBuiltDependencies:
   - "@mark1russell7/cue"

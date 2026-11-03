@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Meds: the medication schedule app, live in your browser</title>
+    <meta name="description" content="The real Meds app in a phone frame, with invented sample items. Hold a tile, drag the hour wheel, move the clock, and see the state machine and the schedule answer." />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231c1c1e'/%3E%3Cg transform='rotate(-40 16 16)'%3E%3Crect x='6' y='11' width='20' height='10' rx='5' fill='%23f2efe6'/%3E%3Cpath d='M16 11h5a5 5 0 0 1 0 10h-5z' fill='%23e8894a'/%3E%3C/g%3E%3C/svg%3E" />
+    <script>
+      // The saved theme applies before the first paint, so a dark page does not flash white.
+      try {
+        const t = localStorage.getItem("meds-theme");
+        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#try">Skip to the app</a>
+    <header class="top">
+      <div class="brand">
+        <h1 class="wordmark"><span class="mark" aria-hidden="true"><i></i></span>Meds</h1>
+        <p class="lead">A phone app that shows when each dose is next. This is the real app, running in your browser. Hold a tile, drag the hours, and move the clock.</p>
+      </div>
+      <nav class="links" aria-label="Site">
+        <a href="#try">Try it</a>
+        <a href="#schedule">Schedule</a>
+        <a href="#how">How it works</a>
+        <a href="releases/">Releases</a>
+        <a href="status/">Status</a>
+        <a href="https://github.com/mark1russell7/Meds">GitHub</a>
+        <button type="button" class="theme" id="theme" aria-label="Color theme">Theme: auto</button>
+      </nav>
+    </header>
+
+    <main>
+      <p class="notice" id="notice">
+        <strong>Sample only.</strong> The names on this page are invented, and they are not real medicines. This page is not medical advice. Everything stays in your browser.
+      </p>
+
+      <section id="try" class="stage" aria-labelledby="try-title">
+        <h2 id="try-title" class="sr">The app, its clock and its state machine</h2>
+        <div class="phone-col">
+          <ol class="steps">
+            <li><strong>Press and hold</strong> a tile to open it.</li>
+            <li><strong>Drag</strong> the hours sideways, then let go.</li>
+            <li><strong>Press and hold</strong> the hours to close it.</li>
+          </ol>
+          <div class="phone">
+            <div class="phone-screen"><div id="app-root"></div></div>
+          </div>
+        </div>
+
+        <div class="side">
+          <div class="card" id="controls">
+            <div class="clock-row">
+              <label class="label" for="clock">Clock</label>
+              <output id="clock-label" class="clock-time" for="clock"></output>
+              <button type="button" class="ghost" id="real-time">Real time</button>
+            </div>
+            <input id="clock" type="range" min="0" max="1425" step="15" aria-describedby="clock-note" />
+            <p class="hint" id="clock-note">The app reads this clock. The schedule code gives each result.</p>
+
+            <span class="label" id="tiles-label">Tile</span>
+            <div class="chips" id="tiles" role="group" aria-labelledby="tiles-label"></div>
+
+            <div class="next" aria-live="polite">
+              <span class="label">Next dose of <span id="focus-name"></span> <code>nextDose()</code></span>
+              <output id="next-dose" class="next-time"></output>
+              <span class="hint">Doses each day <code>dosesInDay()</code>: <span id="doses" class="mono"></span></span>
+            </div>
+            <div class="actions">
+              <button type="button" class="primary" id="jump">Go to the next dose</button>
+              <button type="button" id="hour-down" aria-label="Move the doses 1 hour earlier">1 hour earlier</button>
+              <button type="button" id="hour-up" aria-label="Move the doses 1 hour later">1 hour later</button>
+            </div>
+            <p class="hint">The app does not record a dose that you take. It only shows the next time, so the first button moves the clock to that time.</p>
+          </div>
+
+          <div class="card" id="machine">
+            <div class="card-head">
+              <h3>The state machine of <span id="machine-name"></span></h3>
+              <p class="hint">The real XState machine. The app gives each tile its own actor. The lit box is the state of that actor now.</p>
+            </div>
+            <div class="diagram" id="diagram"></div>
+            <span class="label" id="events-label">Send an event</span>
+            <div class="chips" id="events" role="group" aria-labelledby="events-label"></div>
+            <p class="rule" id="rule" role="status"></p>
+            <ol class="log" id="log" aria-label="The newest events first"></ol>
+          </div>
+        </div>
+      </section>
+
+      <section id="schedule" class="section" aria-labelledby="schedule-title">
+        <div class="section-head">
+          <h2 id="schedule-title">The day</h2>
+          <p class="hint">Each dot is a result of <code>dosesInDay()</code> for the offset in the database. Drag a wheel, and the dots of that item move.</p>
+        </div>
+        <div class="card day">
+          <div class="legend" aria-hidden="true">
+            <span><i class="dot past"></i> Before the clock</span>
+            <span><i class="dot"></i> Later today</span>
+            <span><i class="dot next"></i> Next dose</span>
+            <span><i class="dot tomorrow"></i> Next dose, tomorrow</span>
+          </div>
+          <div class="axis" id="axis" aria-hidden="true"></div>
+          <div class="rows" id="rows"></div>
+        </div>
+      </section>
+
+      <section id="how" class="section" aria-labelledby="how-title">
+        <div class="section-head">
+          <h2 id="how-title">How it works</h2>
+          <p class="hint">The page builds the source of <code>packages/app</code> with no change. <code>react-native-web</code> draws the components of React Native.</p>
+        </div>
+        <div class="how">
+          <div class="card">
+            <h3>The real code</h3>
+            <ul class="files">
+              <li><a href="https://github.com/mark1russell7/Meds/blob/main/packages/app/App.tsx"><code>App.tsx</code></a> and each component: the tiles, the wheel and the dot grid.</li>
+              <li><a href="https://github.com/mark1russell7/Meds/blob/main/packages/app/lib/medMachine.ts"><code>lib/medMachine.ts</code></a>: the state of one tile.</li>
+              <li><a href="https://github.com/mark1russell7/Meds/blob/main/packages/app/lib/useMedRegistry.ts"><code>lib/useMedRegistry.ts</code></a>: it keeps at most one tile open.</li>
+              <li><a href="https://github.com/mark1russell7/Meds/blob/main/packages/app/lib/schedule.ts"><code>lib/schedule.ts</code></a>: the doses of a day and the next dose.</li>
+              <li><a href="https://github.com/mark1russell7/Meds/blob/main/packages/app/lib/layout.ts"><code>lib/layout.ts</code></a>: the grid of tiles.</li>
+              <li><a href="https://github.com/mark1russell7/Meds/blob/main/packages/app/lib/useWheelDrag.ts"><code>lib/useWheelDrag.ts</code></a>: the drag of the hours.</li>
+              <li><a href="https://github.com/mark1russell7/Meds/blob/main/packages/app/lib/medsCollection.ts"><code>lib/medsCollection.ts</code></a>: the SignalDB collection, saved in <code>localStorage</code> here.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>What the page replaces</h3>
+            <ul class="files">
+              <li><strong>The item list.</strong> The page uses five invented names.</li>
+              <li><strong>The clock.</strong> The slider gives the app its time, so you can see any hour of the day.</li>
+              <li><strong>The screen size.</strong> The app reads the size of the phone frame, not of your window.</li>
+              <li><strong>Haptics and the glass effect.</strong> A browser has neither, so the tiles are plain and the buzz does nothing.</li>
+            </ul>
+            <p class="hint">The app starts from its list each time. A reload does the same here, so a reload puts the hours back. The page sends nothing to a server.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p>The names are invented, and this page is not medical advice. <a href="https://github.com/mark1russell7/Meds">github.com/mark1russell7/Meds</a> · <span id="build"></span></p>
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
