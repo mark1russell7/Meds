@@ -1,5 +1,5 @@
 // The start of the page: the theme, the real app in the phone frame, and the views that follow it.
-import { byId, h, setupTheme } from "@mark1russell7/site-pages/chrome";
+import { byId, setupTheme, showBuild } from "@mark1russell7/site-pages/chrome";
 import { medMachine } from "@meds/app/lib/medMachine";
 import { onBridge, type Step } from "./bridge.ts";
 import { onClock } from "./clock.ts";
@@ -56,8 +56,4 @@ onMeds(refresh);
 
 startPhone(byId("app-root"));
 
-byId("build").append(
-  `Version ${__BUILD__.version}, build `,
-  __BUILD__.sha === "local" ? "local" : h("a", { href: `https://github.com/mark1russell7/Meds/commit/${__BUILD__.sha}` }, __BUILD__.sha),
-  ` of ${__BUILD__.date}`,
-);
+showBuild(byId("build"), __BUILD__, "mark1russell7/Meds");
