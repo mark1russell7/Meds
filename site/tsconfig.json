@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@mark1russell7/cue/ts/config/vite.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "composite": false,
+    "incremental": false,
+    "isolatedDeclarations": false,
+    "declaration": false,
+    "declarationMap": false,
+    "jsx": "react-jsx",
+    "exactOptionalPropertyTypes": false,
+    "noUncheckedIndexedAccess": false,
+    "types": [
+      "vite/client",
+      "node"
+    ]
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "src/**/*.test.ts"
+  ]
+}
