@@ -105,6 +105,18 @@ describe("the real app in a browser document", () => {
     }
   });
 
+  it("ends a press when the page scrolls, as the responder system of react-native-web does", async () => {
+    const tile = leaf(root, "Plinkotab");
+    await act(async () => {
+      mouse(tile, "mousedown", 10, 1);
+      document.dispatchEvent(new Event("scroll"));
+      await new Promise((done) => setTimeout(done, 480));
+      mouse(tile, "mouseup", 10, 0);
+    });
+    await flush();
+    expect(stateOf("plinkotab")).toBe("compressed");
+  });
+
   it("opens a tile on a long press, and the second tile closes the first", async () => {
     await hold(leaf(root, "Moonfizz"));
     expect(stateOf("moonfizz")).toBe("expanded");

@@ -31,12 +31,51 @@ const mouse = (target: Element, kind: string, x: number, y: number, buttons: num
   target.dispatchEvent(new MouseEvent(kind, { bubbles: true, cancelable: true, clientX: x, clientY: y, button: 0, buttons }));
 };
 
-/** This function presses an element, holds it and lets it go. */
+/**
+ * This function brings an element to the middle of the screen and waits until the page is still, as a visitor does
+ * before a press. react-native-web ends a press when the page scrolls. On a narrow page the clock is below the phone, so
+ * `type` focuses the slider and starts a smooth scroll to it. The scroll of the window does not touch the phone screen.
+ */
+const settle = async (target: Element) => {
+  const box = target.getBoundingClientRect();
+  window.scrollTo({ top: scrollY + box.y + box.height / 2 - innerHeight / 2, behavior: "instant" });
+  await until(async () => {
+    const y = scrollY;
+    await wait(150);
+    return y === scrollY;
+  });
+};
+
+/** This function presses an element, holds it and lets it go. It also asserts that the page stays still during the press. */
 const hold = async (target: Element, ms: number) => {
+  await settle(target);
+  let scrolls = 0;
+  const count = () => {
+    scrolls += 1;
+  };
+  window.addEventListener("scroll", count, true);
   const box = target.getBoundingClientRect();
   mouse(target, "mousedown", box.x + 4, box.y + 4, 1);
   await wait(ms);
   mouse(target, "mouseup", box.x + 4, box.y + 4, 0);
+  window.removeEventListener("scroll", count, true);
+  check(`the page stays still during the press on ${target.textContent?.slice(0, 16)}`, scrolls === 0, scrolls);
+};
+
+/**
+ * This function gives each part of the app that passes the edge of the phone screen. The dot grid of the app is 2 px
+ * empty boxes, and it draws one more column and one more row than the screen holds, on a phone too. The screen clips
+ * those dots, so a dot is not a part.
+ */
+const pastTheScreen = () => {
+  const edge = $(".phone-screen")!.getBoundingClientRect();
+  return $$("#app-root *")
+    .filter((part) => {
+      const box = part.getBoundingClientRect();
+      const dot = part.children.length === 0 && part.textContent === "" && box.width <= 2 && box.height <= 2;
+      return !dot && (box.left < edge.left - 0.5 || box.top < edge.top - 0.5 || box.right > edge.right + 0.5 || box.bottom > edge.bottom + 0.5);
+    })
+    .map((part) => `${part.textContent?.slice(0, 20)} ${Math.round(part.getBoundingClientRect().right - edge.left)}x${Math.round(part.getBoundingClientRect().bottom - edge.top)}`);
 };
 
 /** This function drags an element sideways in steps. The pan responder ignores a move with the time of the event before it. */
@@ -94,6 +133,7 @@ check("a second tile opens", await until(() => phone().includes("Sunnydrop--6h")
 check("the app closes the first tile", await until(() => chipState("moonfizz") === "compressed" && chipState("sunnydrop") === "expanded"), chipState("moonfizz"));
 check("the app stays at one open tile", text("#rule").startsWith("1 of 5"), text("#rule"));
 check("the log shows that the app sent COLLAPSE", $('#log li[data-tile="moonfizz"][data-event="COLLAPSE"] em') !== null, text("#log"));
+check("the open tile fits the screen of the phone", pastTheScreen().length === 0, pastTheScreen().join());
 check("the panels follow the open tile", text("#machine-name") === "Sunnydrop" && text("#focus-name") === "Sunnydrop", text("#machine-name"));
 
 check("the item starts at its sample hours", dots("sunnydrop") === "2,8,14,20", dots("sunnydrop"));
@@ -141,7 +181,7 @@ for (const selector of ["#controls", "#machine", ".diagram", ".day", ".rows", "#
 }
 const frame = $(".phone")?.getBoundingClientRect();
 check("the phone frame fits the screen", frame !== undefined && frame.left >= 0 && frame.right <= document.documentElement.clientWidth, `${frame?.left} to ${frame?.right}`);
-const screen = $(".phone-screen");
-check("the app fits the screen of the phone", screen !== null && screen.scrollWidth <= screen.clientWidth && screen.scrollHeight <= screen.clientHeight, `${screen?.scrollWidth}x${screen?.scrollHeight}`);
+check("the app fits the screen of the phone", pastTheScreen().length === 0, pastTheScreen().join());
+check("the phone screen holds the app at its full size", $("#app-root")?.clientWidth === 320 && $("#app-root")?.clientHeight === 690, `${$("#app-root")?.clientWidth}x${$("#app-root")?.clientHeight}`);
 
 export {};

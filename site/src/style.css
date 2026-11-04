@@ -382,7 +382,7 @@ input[type="range"] {
   font-size: 0.8rem;
 }
 
-.next {
+.next-panel {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0.1rem;
@@ -391,8 +391,8 @@ input[type="range"] {
   background: var(--next-bg);
 }
 
-.next .label,
-.next .hint {
+.next-panel .label,
+.next-panel .hint {
   color: var(--ink);
 }
 
