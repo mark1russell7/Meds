@@ -1,15 +1,14 @@
 import type { Med } from './types';
 
 /**
- * Initial medication set loaded on app start by `resetAndSeed()`.
- * Each entry's `id` is the stable key used everywhere; renaming `name` is fine,
- * renaming `id` would orphan any persisted offset (since offsets are keyed by id).
+ * Sample items for the app. `resetAndSeed()` loads them on app start.
+ * The names are made up, and they are not a medical schedule.
  */
 export const SEED_MEDS: Med[] = [
-  { id: 'ipratropium', name: 'ipratropium bromide', interval: 12, offset: 0 },
-  { id: 'benzonatate', name: 'benzonatate', interval: 8, offset: 0 },
-  { id: 'acetaminophen', name: 'acetaminophen', interval: 6, offset: 0 },
-  { id: 'albuterol', name: 'albuterol sulfate', interval: 4, offset: 0 },
-  { id: 'flonase', name: 'flonase', interval: 24, offset: 0 },
-  { id: 'allegra', name: 'allegra', interval: 24, offset: 0 },
+  { id: 'sample-a', name: 'Sample A', interval: 4, offset: 0 },
+  { id: 'sample-b', name: 'Sample B', interval: 6, offset: 0 },
+  { id: 'sample-c', name: 'Sample C', interval: 8, offset: 0 },
+  { id: 'sample-d', name: 'Sample D', interval: 12, offset: 0 },
+  { id: 'sample-e', name: 'Sample E', interval: 12, offset: 0 },
+  { id: 'sample-f', name: 'Sample F', interval: 24, offset: 0 },
 ];
