@@ -10,7 +10,7 @@ importers:
     devDependencies:
       '@mark1russell7/cue':
         specifier: github:mark1russell7/cue
-        version: https://codeload.github.com/mark1russell7/cue/tar.gz/7d8011c11489a32700fe4bec06993d4b4281bd9b
+        version: https://codeload.github.com/mark1russell7/cue/tar.gz/2070b173d43abba6ce69eb1a37cd1e5d1c8f50f2
       '@mark1russell7/template-cli':
         specifier: ^0.1.2
         version: 0.1.5
@@ -76,8 +76,8 @@ importers:
   site:
     dependencies:
       '@mark1russell7/site-pages':
-        specifier: ^0.3.4
-        version: 0.3.5
+        specifier: ^0.4.1
+        version: 0.4.1
       '@meds/app':
         specifier: workspace:*
         version: link:../packages/app
@@ -1044,8 +1044,8 @@ packages:
     engines: {node: '>=22'}
     hasBin: true
 
-  '@mark1russell7/cue@https://codeload.github.com/mark1russell7/cue/tar.gz/7d8011c11489a32700fe4bec06993d4b4281bd9b':
-    resolution: {tarball: https://codeload.github.com/mark1russell7/cue/tar.gz/7d8011c11489a32700fe4bec06993d4b4281bd9b}
+  '@mark1russell7/cue@https://codeload.github.com/mark1russell7/cue/tar.gz/2070b173d43abba6ce69eb1a37cd1e5d1c8f50f2':
+    resolution: {tarball: https://codeload.github.com/mark1russell7/cue/tar.gz/2070b173d43abba6ce69eb1a37cd1e5d1c8f50f2}
     version: 2.1.1
     engines: {node: '>=22'}
     hasBin: true
@@ -1058,8 +1058,8 @@ packages:
     resolution: {integrity: sha512-dxr3UiAs64JXV3trXCaTRTesHqXEMUoVvDGIyrz0BWsAZERA/lrIQNUATFAuqnAWzdmbHUyi/5nzA4uPXTSTJw==}
     engines: {node: '>=22'}
 
-  '@mark1russell7/site-pages@0.3.5':
-    resolution: {integrity: sha512-3/VryGHcANgpTwAdAeyWL08I2qpfyUoXCVBUYtzjRQDpGT4i/wCUgJpAziiJrhY5g8HDOOsKgP/9Nf+kGh0a7Q==}
+  '@mark1russell7/site-pages@0.4.1':
+    resolution: {integrity: sha512-YYPPHH3ee6No2VL+yl+mholtu7m1qdZWTf5ldYLxxZyyrsE55rPFHwIPZOnkxH6OJ7GtzqUn37/cfOg7UJqP9A==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -4699,7 +4699,7 @@ snapshots:
 
   '@mark1russell7/cue@2.1.1': {}
 
-  '@mark1russell7/cue@https://codeload.github.com/mark1russell7/cue/tar.gz/7d8011c11489a32700fe4bec06993d4b4281bd9b': {}
+  '@mark1russell7/cue@https://codeload.github.com/mark1russell7/cue/tar.gz/2070b173d43abba6ce69eb1a37cd1e5d1c8f50f2': {}
 
   '@mark1russell7/rigor-generators@0.1.6': {}
 
@@ -4707,7 +4707,7 @@ snapshots:
     dependencies:
       '@mark1russell7/rigor-generators': 0.1.6
 
-  '@mark1russell7/site-pages@0.3.5':
+  '@mark1russell7/site-pages@0.4.1':
     dependencies:
       '@mark1russell7/rigor-statistics': 0.1.15
 
