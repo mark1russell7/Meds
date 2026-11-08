@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   security:
-    uses: mark1russell7/template/.github/workflows/reusable-security.yml@e077054e0f2ebb8441e4bc525b56cf2acc2afb6f # main
+    uses: mark1russell7/template/.github/workflows/reusable-security.yml@c3c43390d490c66e92d1959d0829a1e0597fab30 # main
     permissions:
       contents: read
       security-events: write
