@@ -1,4 +1,10 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>mark1russell7/template//renovate/default", "github>mark1russell7/template//renovate/expo"]
+  "extends": [
+    "github>mark1russell7/template//renovate/default",
+    "github>mark1russell7/template//renovate/expo"
+  ],
+  "schedule": [
+    "before 6am on friday"
+  ]
 }
