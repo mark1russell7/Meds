@@ -19,6 +19,22 @@ concurrency:
 jobs:
   ci:
     uses: mark1russell7/template/.github/workflows/reusable-ci.yml@7fcc1036a4b10f7f8d35c7d08f161cd872b03243 # main
+    with:
+      # The gate of the overrides of the Expo tools (pnpm-workspace.yaml). Their users are @expo/cli, @expo/config and
+      # @expo/fingerprint, so the gate starts those tools. The script build of packages/app exports android.
+      # 1. An export for ios. 2. expo-doctor. 3. The fingerprint of the installed @expo/fingerprint, with the overrides,
+      # is the fingerprint of the same version from the registry outside the workspace, with its own dependencies.
+      # The same hash tells that the new glob and minimatch find the same files.
+      run: |
+        set -euo pipefail
+        app="$PWD/packages/app"
+        (cd "$app" && pnpm exec expo export --platform ios --output-dir "$RUNNER_TEMP/export-ios")
+        (cd "$app" && pnpm dlx expo-doctor@1.21.6)
+        fingerprint_hash() { node -e 'let s="";process.stdin.on("data",(d)=>(s+=d)).on("end",()=>{const f=JSON.parse(s);console.log(f.hash);console.error(`${f.sources.length} sources`)})'; }
+        ours=$(cd "$app" && pnpm exec fingerprint "$app" | fingerprint_hash)
+        theirs=$(cd "$RUNNER_TEMP" && pnpm dlx @expo/fingerprint@0.15.5 "$app" | fingerprint_hash)
+        echo "fingerprint with the overrides: $ours, from the registry: $theirs"
+        [ "$ours" = "$theirs" ]
 
   # Each preset of `pnpm package add` makes a package, and that package passes its typecheck and its tests.
   # The tests of the preset service hold its entry to describe() and lint() of @mark1russell7/service (OTH-5).
