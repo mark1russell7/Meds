@@ -15,7 +15,7 @@
   "devDependencies": {
     "@mark1russell7/cue": "github:mark1russell7/cue",
     "@mark1russell7/template-cli": "^0.1.2",
-    "tsx": "^4.19.2",
+    "tsx": "^4.23.15",
     "typescript": "^5.7.2"
   }
 }
