@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   ci:
-    uses: mark1russell7/template/.github/workflows/reusable-ci.yml@7fcc1036a4b10f7f8d35c7d08f161cd872b03243 # main
+    uses: mark1russell7/template/.github/workflows/reusable-ci.yml@e5528b40a615db0f2e0f341c5ec0fa860ca47cc0 # main
     with:
       # The gate of the overrides of the Expo tools (pnpm-workspace.yaml). Their users are @expo/cli, @expo/config and
       # @expo/fingerprint, so the gate starts those tools. The script build of packages/app exports android.
