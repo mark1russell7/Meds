@@ -35,10 +35,10 @@ importers:
     devDependencies:
       '@mark1russell7/cue':
         specifier: github:mark1russell7/cue
-        version: https://codeload.github.com/mark1russell7/cue/tar.gz/2665e5199fc4b2b7e3f54c1a041254f51101ebf7
+        version: https://codeload.github.com/mark1russell7/cue/tar.gz/d49543bebb53ef46e02568fa75f251a15eadffaa
       '@mark1russell7/template-cli':
         specifier: ^0.1.2
-        version: 0.1.7
+        version: 0.1.9
       tsx:
         specifier: ^4.23.15
         version: 4.23.15
@@ -104,8 +104,8 @@ importers:
   site:
     dependencies:
       '@mark1russell7/site-pages':
-        specifier: ^0.5.0
-        version: 0.5.0
+        specifier: ^0.7.0
+        version: 0.7.0
       '@meds/app':
         specifier: workspace:*
         version: link:../packages/app
@@ -1079,8 +1079,8 @@ packages:
     engines: {node: '>=22'}
     hasBin: true
 
-  '@mark1russell7/cue@https://codeload.github.com/mark1russell7/cue/tar.gz/2665e5199fc4b2b7e3f54c1a041254f51101ebf7':
-    resolution: {tarball: https://codeload.github.com/mark1russell7/cue/tar.gz/2665e5199fc4b2b7e3f54c1a041254f51101ebf7}
+  '@mark1russell7/cue@https://codeload.github.com/mark1russell7/cue/tar.gz/d49543bebb53ef46e02568fa75f251a15eadffaa':
+    resolution: {tarball: https://codeload.github.com/mark1russell7/cue/tar.gz/d49543bebb53ef46e02568fa75f251a15eadffaa}
     version: 2.1.4
     engines: {node: '>=22'}
     hasBin: true
@@ -1093,13 +1093,13 @@ packages:
     resolution: {integrity: sha512-0L075rT+toD6edxEwDdZHiFzHP4+dJrI64Pw5gh9V33VwCfNRUMQY90AooDpMgVcC9cuxHNXegDLSOYU9ZMIlA==}
     engines: {node: '>=22'}
 
-  '@mark1russell7/site-pages@0.5.0':
-    resolution: {integrity: sha512-sGDFRCr2fIRarRV4FCoDvfYBSOln134N9ApuwNMKXYtiiXpPv8LMeUUB/19QQU7fJDKWGZgqPSAJZ/+RA7p63A==}
+  '@mark1russell7/site-pages@0.7.0':
+    resolution: {integrity: sha512-nFiaxs1D/IAxj54KUow0AkU35fxWj6iCHAcQ2GG2ISv0yD+YwnOoDHNmO1mV1g+roRV7G5czJNZlzv+3lcT2vg==}
     engines: {node: '>=22'}
     hasBin: true
 
-  '@mark1russell7/template-cli@0.1.7':
-    resolution: {integrity: sha512-Wy4xa6OgNXyMunSyXOArxmrspLSCuyw1pf1P5X45Uiwe1aWHzn0LJptUYVGUSwT3GTp9FGVDhFMeOnKlapD3Xw==}
+  '@mark1russell7/template-cli@0.1.9':
+    resolution: {integrity: sha512-7ebtLlCmT6KYhbpoI2SZHXCQC6/7Rc660SvKwQvfslseSQrXMRlmBj+1/F5KOCep6aB+LtvGWg+HmTKi6uZjyQ==}
     engines: {node: '>=22.12'}
     hasBin: true
 
@@ -4637,7 +4637,7 @@ snapshots:
 
   '@mark1russell7/cue@2.1.4': {}
 
-  '@mark1russell7/cue@https://codeload.github.com/mark1russell7/cue/tar.gz/2665e5199fc4b2b7e3f54c1a041254f51101ebf7': {}
+  '@mark1russell7/cue@https://codeload.github.com/mark1russell7/cue/tar.gz/d49543bebb53ef46e02568fa75f251a15eadffaa': {}
 
   '@mark1russell7/rigor-generators@0.1.16': {}
 
@@ -4645,11 +4645,11 @@ snapshots:
     dependencies:
       '@mark1russell7/rigor-generators': 0.1.16
 
-  '@mark1russell7/site-pages@0.5.0':
+  '@mark1russell7/site-pages@0.7.0':
     dependencies:
       '@mark1russell7/rigor-statistics': 0.2.4
 
-  '@mark1russell7/template-cli@0.1.7':
+  '@mark1russell7/template-cli@0.1.9':
     dependencies:
       '@clack/prompts': 1.8.1
 
