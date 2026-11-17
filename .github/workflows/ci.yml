@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   ci:
-    uses: mark1russell7/template/.github/workflows/reusable-ci.yml@f7e9a04c2e3965d20d1aea5a2e83e96ce8d23d16 # main
+    uses: mark1russell7/template/.github/workflows/reusable-ci.yml@2030c7dec9485afebb504772f79f41f23bdb2df7 # main
     with:
       # The gate of the overrides of the Expo tools (pnpm-workspace.yaml). Their users are @expo/cli, @expo/config and
       # @expo/fingerprint, so the gate starts those tools. The script build of packages/app exports android.
@@ -71,13 +71,20 @@ jobs:
       - run: pnpm --filter "@template/$PACKAGE" typecheck
       - run: pnpm --filter "@template/$PACKAGE" test
 
+  # The site of .github/site.json: the build, the site check and the probe, with no deploy (CI.md of the
+  # template, "The site config"). The Pages workflow deploys the same site from main.
+  site:
+    uses: mark1russell7/template/.github/workflows/reusable-pages-check.yml@2030c7dec9485afebb504772f79f41f23bdb2df7 # main
+    permissions:
+      contents: read
+
   # The one check of the ruleset of main (CI.md, "The check of the ruleset"). It passes only when
   # each job of needs passed, or was skipped by its own if and ALLOW_SKIP names it. A new job of this
   # file goes in needs, so the ruleset never has to change, and gh pr merge --auto waits for the whole gate.
   ci-ok:
     name: CI OK
     if: ${{ !cancelled() }}
-    needs: [ci, presets]
+    needs: [ci, presets, site]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions: {}
