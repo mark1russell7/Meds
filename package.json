@@ -3,7 +3,7 @@
   "name": "meds-monorepo",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@10.34.9",
   "engines": {
     "node": ">=22"
   },
