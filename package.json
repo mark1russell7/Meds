@@ -15,7 +15,7 @@
     "check:conventions": "conventions check"
   },
   "devDependencies": {
-    "@mark1russell7/conventions": "^0.53.2",
+    "@mark1russell7/conventions": "^0.54.0",
     "@mark1russell7/cue": "github:mark1russell7/cue#55d0ce98ea4cd2dd950759990466876f9ae146bc",
     "@mark1russell7/template-cli": "^0.1.2",
     "tsx": "^4.23.15",
