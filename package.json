@@ -10,12 +10,23 @@
   "scripts": {
     "package": "template package",
     "test": "pnpm -r run test",
-    "typecheck": "pnpm -r run typecheck"
+    "typecheck": "pnpm -r run typecheck",
+    "check:conventions": "conventions check"
   },
   "devDependencies": {
+    "@mark1russell7/conventions": "^0.53.2",
     "@mark1russell7/cue": "github:mark1russell7/cue",
     "@mark1russell7/template-cli": "^0.1.2",
     "tsx": "^4.23.15",
     "typescript": "^5.7.2"
+  },
+  "conventions": {
+    "rules": {
+      "no-console": {
+        "baseline": 0,
+        "failFrom": "2027-01-20",
+        "reason": "The census of 2026-11-25 found 0 console calls. Each new call fails from 2027-01-20."
+      }
+    }
   }
 }
