@@ -10,8 +10,6 @@
     "declaration": false,
     "declarationMap": false,
     "jsx": "react-jsx",
-    "exactOptionalPropertyTypes": false,
-    "noUncheckedIndexedAccess": false,
     "types": [
       "vite/client",
       "node"

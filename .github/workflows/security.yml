@@ -10,14 +10,14 @@ on:
   # A weekly scan finds the new advisories for the dependencies that do not change. The minute comes from the
   # repository and the file (the rule runner-budget), so the scans of the repositories do not start together.
   schedule:
-    - cron: "28 5 * * 1"
+    - cron: "49 5 * * 1"
   workflow_dispatch:
 
 permissions: {}
 
 concurrency:
-  group: security-${{ github.ref }}
-  cancel-in-progress: true
+  group: security-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   security-ok:
