@@ -28,10 +28,10 @@ export type WheelProps = {
   renderTile: (info: WheelTileInfo) => ReactNode;
 
   /** Visual overrides. */
-  style?: ViewStyle;
-  tickStyle?: ViewStyle;
+  style?: ViewStyle | undefined;
+  tickStyle?: ViewStyle | undefined;
   /** Pixel width of each tile; the rendered Animated.View is sized to this. Default 44. */
-  tileWidth?: number;
+  tileWidth?: number | undefined;
 };
 
 /**

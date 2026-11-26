@@ -13,11 +13,11 @@ export type LongPressController = {
 
 export type UseLongPressOptions = {
   /** Hold duration in ms before activation. Default 500. */
-  ms?: number;
+  ms?: number | undefined;
   /** Pixel threshold of pan movement that cancels the press. Default 5. */
-  movementThresholdPx?: number;
+  movementThresholdPx?: number | undefined;
   /** Fires once when the timer elapses without being cancelled. */
-  onActivate?: () => void;
+  onActivate?: () => void | undefined;
 };
 
 /**

@@ -35,10 +35,11 @@ export function nextDose(
   now: Date,
 ): { hour: number; tomorrow: boolean } {
   const doses = dosesInDay(med, offset);
-  if (doses.length === 0) return { hour: 0, tomorrow: false };
+  const first = doses[0];
+  if (first === undefined) return { hour: 0, tomorrow: false };
   const hourNow = now.getHours() + now.getMinutes() / 60;
   const upcoming = doses.find((h) => h > hourNow);
   return upcoming !== undefined
     ? { hour: upcoming, tomorrow: false }
-    : { hour: doses[0], tomorrow: true };
+    : { hour: first, tomorrow: true };
 }
