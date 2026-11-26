@@ -35,7 +35,7 @@ export type UseConstrainedMapOptions<K, V> = {
    * `LayoutAnimation.configureNext(...)` (or other side-effects) right next
    * to the mutation that triggered the layout change.
    */
-  beforeChange?: () => void | undefined;
+  beforeChange?: (() => void) | undefined;
   /**
    * Fires synchronously when entries are removed from the map, before the
    * new state is committed. The `cause` arg discriminates constraint-driven
@@ -48,7 +48,7 @@ export type UseConstrainedMapOptions<K, V> = {
    * with the originating mutation — important when this is paired with
    * `LayoutAnimation.configureNext`.
    */
-  onEvict?: (entries: ReadonlyMap<K, V>, cause: EvictCause) => void | undefined;
+  onEvict?: ((entries: ReadonlyMap<K, V>, cause: EvictCause) => void) | undefined;
 };
 
 export type ConstrainedMapApi<K, V> = {

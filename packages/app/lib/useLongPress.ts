@@ -17,7 +17,7 @@ export type UseLongPressOptions = {
   /** Pixel threshold of pan movement that cancels the press. Default 5. */
   movementThresholdPx?: number | undefined;
   /** Fires once when the timer elapses without being cancelled. */
-  onActivate?: () => void | undefined;
+  onActivate?: (() => void) | undefined;
 };
 
 /**

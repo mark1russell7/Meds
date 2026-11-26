@@ -10,13 +10,13 @@ export type UseWheelDragOptions = {
   /** Externally-controlled offset. Synced into the wheel when not actively dragging. */
   offset: number;
   /** Fires per integer crossing while dragging. */
-  onChange?: (offset: number) => void | undefined;
+  onChange?: ((offset: number) => void) | undefined;
   /** Fires once on release with the final offset (unless a long-press fired first). */
-  onCommit?: (offset: number) => void | undefined;
+  onCommit?: ((offset: number) => void) | undefined;
   /** Fires once per integer crossing — typically wired to a haptic. */
-  onTick?: () => void | undefined;
+  onTick?: (() => void) | undefined;
   /** Fires when the user holds without significant movement for `longPressMs`. */
-  onLongPress?: () => void | undefined;
+  onLongPress?: (() => void) | undefined;
   /** Long-press duration in ms. Default 500. */
   longPressMs?: number | undefined;
 };
