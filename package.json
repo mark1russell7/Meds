@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@mark1russell7/conventions": "^0.53.2",
-    "@mark1russell7/cue": "github:mark1russell7/cue#25ad04f7fb9f0df122aa60f7f80ccf6537d12cda",
+    "@mark1russell7/cue": "github:mark1russell7/cue#55d0ce98ea4cd2dd950759990466876f9ae146bc",
     "@mark1russell7/template-cli": "^0.1.2",
     "tsx": "^4.23.15",
     "typescript": "^5.7.2"
