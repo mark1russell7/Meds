@@ -27,15 +27,15 @@ export type EvictCause = 'constraint' | 'delete' | 'clear';
 
 export type UseConstrainedMapOptions<K, V> = {
   /** Cardinality rule. Defaults to `'none'`. */
-  constraint?: Constraint;
+  constraint?: Constraint | undefined;
   /** Initial entries. */
-  initial?: Iterable<readonly [K, V]>;
+  initial?: Iterable<readonly [K, V]> | undefined;
   /**
    * Fires synchronously before each state update. Useful for wiring
    * `LayoutAnimation.configureNext(...)` (or other side-effects) right next
    * to the mutation that triggered the layout change.
    */
-  beforeChange?: () => void;
+  beforeChange?: (() => void) | undefined;
   /**
    * Fires synchronously when entries are removed from the map, before the
    * new state is committed. The `cause` arg discriminates constraint-driven
@@ -48,7 +48,7 @@ export type UseConstrainedMapOptions<K, V> = {
    * with the originating mutation — important when this is paired with
    * `LayoutAnimation.configureNext`.
    */
-  onEvict?: (entries: ReadonlyMap<K, V>, cause: EvictCause) => void;
+  onEvict?: ((entries: ReadonlyMap<K, V>, cause: EvictCause) => void) | undefined;
 };
 
 export type ConstrainedMapApi<K, V> = {

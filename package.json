@@ -2,6 +2,7 @@
   "$schema": "https://json.schemastore.org/package",
   "name": "meds-monorepo",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "packageManager": "pnpm@10.33.0",
   "engines": {
@@ -10,12 +11,35 @@
   "scripts": {
     "package": "template package",
     "test": "pnpm -r run test",
-    "typecheck": "pnpm -r run typecheck"
+    "typecheck": "pnpm -r run typecheck",
+    "check:conventions": "conventions check"
   },
   "devDependencies": {
-    "@mark1russell7/cue": "github:mark1russell7/cue",
+    "@mark1russell7/conventions": "^0.53.2",
+    "@mark1russell7/cue": "github:mark1russell7/cue#55d0ce98ea4cd2dd950759990466876f9ae146bc",
     "@mark1russell7/template-cli": "^0.1.2",
     "tsx": "^4.23.15",
     "typescript": "^5.7.2"
+  },
+  "conventions": {
+    "rules": {
+      "no-console": {
+        "baseline": 0,
+        "failFrom": "2027-01-20",
+        "reason": "The census of 2026-11-25 found 0 console calls. Each new call fails from 2027-01-20."
+      },
+      "source-main": {
+        "ignore": [
+          "packages/app/package.json"
+        ],
+        "reason": "packages/app is an Expo app, not a library: Expo starts the file of main (index.ts), which registers the root component."
+      },
+      "cue-preset": {
+        "ignore": [
+          "packages/app/tsconfig.json"
+        ],
+        "reason": "packages/app is an Expo app: its tsconfig.json extends expo/tsconfig.base, which has the settings of the Expo and React Native build, with strict on."
+      }
+    }
   }
 }
